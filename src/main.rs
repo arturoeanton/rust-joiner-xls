@@ -200,14 +200,14 @@ fn main() {
                 .short("b")
                 .long("sheet2")
                 .value_name("Sheet2")
-                .help("Sheet 2")
+                .help("Sheet 2"),
         )
         .arg(
             Arg::with_name("sheet_out")
                 .short("s")
                 .long("sheet_out")
                 .value_name("SheetOut")
-                .help("Sheet Out")
+                .help("Sheet Out"),
         )
         .arg(
             Arg::with_name("field_match1")
@@ -241,17 +241,16 @@ fn main() {
         )
         .get_matches();
 
-    let field_output =   matches.value_of("fields_output").unwrap().to_string();
+    let field_output = matches.value_of("fields_output").unwrap().to_string();
     let field_match1 = matches.value_of("field_match1").unwrap().to_string();
     let field_match2 = matches.value_of("field_match2").unwrap().to_string();
-    let distinct = matches.is_present("distinct"); 
+    let distinct = matches.is_present("distinct");
     let name_file1 = matches.value_of("file1").unwrap();
     let name_file2 = matches.value_of("file2").unwrap_or(name_file1);
     let name_file_out = matches.value_of("file_out").unwrap();
-    let sheet_name1 =  matches.value_of("sheet1").unwrap_or("Sheet1");
+    let sheet_name1 = matches.value_of("sheet1").unwrap_or("Sheet1");
     let sheet_name2 = matches.value_of("sheet2").unwrap_or(sheet_name1);
     let sheet_name_out = matches.value_of("sheet_out").unwrap_or("Sheet1");
-    
 
     let page1 = reader_xlsx(&name_file1, &sheet_name1).unwrap();
     let page2 = reader_xlsx(&name_file2, &sheet_name2).unwrap();
@@ -266,6 +265,6 @@ cargo run -- \
     --file1 "./test_files/test_dup.xlsx"  --file_out "./out_files/test_dup1.xlsx"  --sheet1 "Vista Qlik"  --sheet2 "Spool (SISE)"  \
     --field_match1 numpol \
     --field_match2 Poliza \
-    --fields_output "Poliza, numpol, Chasis,desmotor, producto='pepe pe', codepais=ar, Zona Riesgo"   
+    --fields_output "Poliza, numpol, Chasis,desmotor, producto='pepe pe', codepais=ar, Zona Riesgo"
 
 */
