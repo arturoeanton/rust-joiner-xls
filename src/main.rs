@@ -107,19 +107,19 @@ fn create_new_excel(
                         if dt.is_int() {
                             let v = dt.get_int().unwrap_or_default();
                             let cell = CellValue::Number(v as f64);
-                            row_writer.add_cell(cell, CellStyle::Left);
+                            row_writer.add_cell(cell, CellStyle::BoldLeft);
                         } else if dt.is_float() {
                             let v = dt.get_float().unwrap_or_default();
                             let cell = CellValue::Number(v);
-                            row_writer.add_cell(cell,CellStyle::Left);
+                            row_writer.add_cell(cell,CellStyle::BoldLeft);
                         } else if dt.is_bool() {
                             let v = dt.get_bool().unwrap_or_default();
                             let cell = CellValue::Bool(v);
-                            row_writer.add_cell(cell,CellStyle::Right);
+                            row_writer.add_cell(cell,CellStyle::BoldLeft);
                         } else if dt.is_empty() {
                             row_writer.add_empty_cells(1);
                         } else {
-                            row_writer.add_cell(dt.get_string().unwrap_or_default(),CellStyle::Left);
+                            row_writer.add_cell(dt.get_string().unwrap_or_default(),CellStyle::BoldRight);
                         }
                     }
                     None => {}
