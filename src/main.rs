@@ -91,7 +91,7 @@ fn create_new_excel(
 
         let mut row = Row::new();
         for field in fields.iter() {
-            row.add_cell(field.to_string(), CellStyle{index:5});
+            row.add_cell(field.to_string(), CellStyle::Bold);
         }
         let mut result = sw.append_row(row);
 

@@ -36,9 +36,31 @@ pub struct Row {
     max_col_index: usize,
 }
 
-pub struct CellStyle {
-    pub index: i32,
+pub enum CellStyle {
+    
+    Normal = 0,
+    Bold = 1,
+    Italic = 2,
+    BoldItalic = 3,
+    
+    Left = 4,
+    Center = 5,
+    Right = 6,
+    
+    BoldLeft = 7,
+    BoldCenter = 8,
+    BoldRight =     9,   
+    
+    ItalicLeft = 10 ,
+    ItalicCenter = 11,
+    ItalicRight = 12,
+
+    BoldItalicLeft = 13,
+    BoldItalicCenter = 14,
+    BoldItalicRight =15,
+
 }
+
 pub struct Cell {
     pub column_index: usize,
     pub value: CellValue,
@@ -180,24 +202,25 @@ fn write_value(
     ref_id: String,
     writer: &mut dyn Write,
 ) -> Result<()> {
+    let index = (*cs)  as i32;
     match cv {
         CellValue::Bool(b) => {
             let v = if *b { 1 } else { 0 };
             let s = format!(
                 "<c r=\"{}\" t=\"b\" s=\"{}\" ><v>{}</v></c>",
-                ref_id, cs.index, v
+                ref_id, index, v
             );
             writer.write_all(s.as_bytes())?;
         }
         CellValue::Number(num) => {
-            let s = format!("<c r=\"{}\" s=\"{}\" ><v>{}</v></c>", ref_id, cs.index, num);
+            let s = format!("<c r=\"{}\" s=\"{}\" ><v>{}</v></c>", ref_id, index, num);
             writer.write_all(s.as_bytes())?;
         }
         CellValue::String(ref s) => {
             let s = format!(
                 "<c r=\"{}\" t=\"str\" s=\"{}\" ><v>{}</v></c>",
                 ref_id,
-                cs.index,
+                index,
                 escape_xml(&s),
             );
             writer.write_all(s.as_bytes())?;
@@ -205,7 +228,7 @@ fn write_value(
         CellValue::SharedString(ref s) => {
             let s = format!(
                 "<c r=\"{}\" t=\"s\" s=\"{}\" ><v>{}</v></c>",
-                ref_id, cs.index, s
+                ref_id, index, s
             );
             writer.write_all(s.as_bytes())?;
         }
