@@ -161,7 +161,7 @@ fn create_new_excel(
 fn main() {
     let matches = App::new("rust-joiner-excel")
         .version("1.0")
-        .about("Joiner excel")
+        .about("Rust Joiner Excel")
         .arg(
             Arg::with_name("file1")
                 .short("1")
@@ -201,7 +201,6 @@ fn main() {
                 .long("sheet2")
                 .value_name("Sheet2")
                 .help("Sheet 2")
-                .required(true),
         )
         .arg(
             Arg::with_name("sheet_out")
@@ -243,27 +242,15 @@ fn main() {
         .get_matches();
 
     let field_output =   matches.value_of("fields_output").unwrap().to_string();
-        //"Poliza, numpol, Chasis,desmotor, producto='pepe pe', codepais=ar, Zona Riesgo";
     let field_match1 = matches.value_of("field_match1").unwrap().to_string();
-    //"numpol".to_string();
     let field_match2 = matches.value_of("field_match2").unwrap().to_string();
-    //"Poliza".to_string();
     let distinct = matches.is_present("distinct"); 
-    //true;
     let name_file1 = matches.value_of("file1").unwrap();
-    //"./test_files/test_dup.xlsx".to_string();
     let name_file2 = matches.value_of("file2").unwrap_or(name_file1);
-    //"./test_files/test_dup.xlsx".to_string();
     let name_file_out = matches.value_of("file_out").unwrap();
-    //"./out_files/test_dup.xlsx".to_string();
-
     let sheet_name1 =  matches.value_of("sheet1").unwrap_or("Sheet1");
-    //"Vista Qlik".to_string();
-    let sheet_name2 = matches.value_of("sheet2").unwrap_or("Sheet1");
-    //"Spool (SISE)".to_string();
-
+    let sheet_name2 = matches.value_of("sheet2").unwrap_or(sheet_name1);
     let sheet_name_out = matches.value_of("sheet_out").unwrap_or("Sheet1");
-    //"Sheet1".to_string();
     
 
     let page1 = reader_xlsx(&name_file1, &sheet_name1).unwrap();
