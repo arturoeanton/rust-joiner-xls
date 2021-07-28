@@ -137,7 +137,7 @@ fn create_new_excel(
                             if  v[0..1].to_string() == "\'" && v[v.len()-1..v.len()].to_string() == "\'" {
                                 v = v[1..v.len()-1].to_string();
                             }
-                            println!("{v}",v);
+                            println!("{}",v);
 
                             row_writer.add_cell(value_fix,CellStyle::Left);
                         }
