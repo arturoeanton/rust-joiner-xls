@@ -91,19 +91,26 @@ fn create_new_excel(
 
         let mut row = Row::new();
         for field in fields.iter() {
+            
+            let data_fix : Vec<&str> = field.split("=").collect();
+            if data_fix.len() == 2 {
+                let key_fix = data_fix[0].trim();
+                row.add_cell(key_fix,CellStyle::BoldLeft);
+                continue;
+            }
             row.add_cell(field.to_string(), CellStyle::BoldCenter);
         }
+        
         let mut result = sw.append_row(row);
 
         for page_row in page.iter() {
             let mut row_writer = Row::new();
             for field in fields.iter() {
                 let key = String::from(field.to_string());
-                let data = page_row.get(key.trim());
+                let data1 = page_row.get(key.trim());
 
-                match Some(data) {
-                    Some(data) => {
-                        let dt = data.unwrap();
+                match data1 {
+                    Some(dt) => {
                         if dt.is_int() {
                             let v = dt.get_int().unwrap_or_default();
                             let cell = CellValue::Number(v as f64);
@@ -119,10 +126,22 @@ fn create_new_excel(
                         } else if dt.is_empty() {
                             row_writer.add_empty_cells(1);
                         } else {
-                            row_writer.add_cell(dt.get_string().unwrap_or_default(),CellStyle::BoldRight);
+                            row_writer.add_cell(dt.get_string().unwrap_or_default(),CellStyle::Left);
                         }
                     }
-                    None => {}
+                    None => {
+                        let data_fix : Vec<&str> = key.split("=").collect();
+                        if data_fix.len() == 2 {
+                            let  value_fix = data_fix[1].trim();
+                            let mut v = value_fix.to_string();
+                            if  v[0..1].to_string() == "\'" && v[v.len()-1..v.len()].to_string() == "\'" {
+                                v = v[1..v.len()-1].to_string();
+                            }
+                            println!("{v}",v);
+
+                            row_writer.add_cell(value_fix,CellStyle::Left);
+                        }
+                    }
                 }
             }
             result = sw.append_row(row_writer);
@@ -137,7 +156,7 @@ fn create_new_excel(
 
 #[allow(unused_variables)]
 fn main() {
-    let field_output = "Poliza, numpol, Chasis,desmotor, Zona Riesgo";
+    let field_output = "Poliza, numpol, Chasis,desmotor, producto='pepe pe', codepais=ar, Zona Riesgo";
     let field_match1 = "numpol".to_string();
     let field_match2 = "Poliza".to_string();
     let distinct = true;
@@ -148,6 +167,7 @@ fn main() {
     let sheet_name1 = "Vista Qlik".to_string();
     let sheet_name2 = "Spool (SISE)".to_string();
     let sheet_name_out = "Sheet1".to_string();
+
 
     let page1 = reader_xlsx(&name_file1, &sheet_name1).unwrap();
     let page2 = reader_xlsx(&name_file2, &sheet_name2).unwrap();
