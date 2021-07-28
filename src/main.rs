@@ -161,7 +161,6 @@ fn create_new_excel(
 fn main() {
     let matches = App::new("rust-joiner-excel")
         .version("1.0")
-        .author("Arturo Elias Anton <arturoeanton@gmail.com>")
         .about("Joiner excel")
         .arg(
             Arg::with_name("file1")
