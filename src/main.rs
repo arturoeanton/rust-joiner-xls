@@ -1,9 +1,11 @@
-mod simple_excel_writer ;
+mod simple_excel_writer;
 
 use simple_excel_writer::*;
 
 use calamine::{open_workbook, DataType, Error, Reader, Xlsx};
 use std::collections::hash_map::HashMap;
+
+use clap::{App, Arg};
 
 fn reader_xlsx(path: &str, sheet1: &str) -> Result<Vec<HashMap<String, DataType>>, Error> {
     let mut page: Vec<HashMap<String, DataType>> = Vec::new();
@@ -91,16 +93,14 @@ fn create_new_excel(
 
         let mut row = Row::new();
         for field in fields.iter() {
-            
-            let data_fix : Vec<&str> = field.split("=").collect();
+            let data_fix: Vec<&str> = field.split("=").collect();
             if data_fix.len() == 2 {
                 let key_fix = data_fix[0].trim();
-                row.add_cell(key_fix,CellStyle::BoldLeft);
+                row.add_cell(key_fix, CellStyle::BoldLeft);
                 continue;
             }
             row.add_cell(field.to_string(), CellStyle::BoldCenter);
         }
-        
         let mut result = sw.append_row(row);
 
         for page_row in page.iter() {
@@ -118,28 +118,31 @@ fn create_new_excel(
                         } else if dt.is_float() {
                             let v = dt.get_float().unwrap_or_default();
                             let cell = CellValue::Number(v);
-                            row_writer.add_cell(cell,CellStyle::BoldLeft);
+                            row_writer.add_cell(cell, CellStyle::BoldLeft);
                         } else if dt.is_bool() {
                             let v = dt.get_bool().unwrap_or_default();
                             let cell = CellValue::Bool(v);
-                            row_writer.add_cell(cell,CellStyle::BoldLeft);
+                            row_writer.add_cell(cell, CellStyle::BoldLeft);
                         } else if dt.is_empty() {
                             row_writer.add_empty_cells(1);
                         } else {
-                            row_writer.add_cell(dt.get_string().unwrap_or_default(),CellStyle::Left);
+                            row_writer
+                                .add_cell(dt.get_string().unwrap_or_default(), CellStyle::Left);
                         }
                     }
                     None => {
-                        let data_fix : Vec<&str> = key.split("=").collect();
+                        let data_fix: Vec<&str> = key.split("=").collect();
                         if data_fix.len() == 2 {
-                            let  value_fix = data_fix[1].trim();
+                            let value_fix = data_fix[1].trim();
                             let mut v = value_fix.to_string();
-                            if  v[0..1].to_string() == "\'" && v[v.len()-1..v.len()].to_string() == "\'" {
-                                v = v[1..v.len()-1].to_string();
+                            match (v.chars().nth(0), v.chars().rev().nth(0)) {
+                                (Some('\''), Some('\'')) => {
+                                    v.pop();
+                                    v = v[1..].to_string()
+                                }
+                                _ => {}
                             }
-                            println!("{}",v);
-
-                            row_writer.add_cell(value_fix,CellStyle::Left);
+                            row_writer.add_cell(v, CellStyle::Left);
                         }
                     }
                 }
@@ -156,18 +159,113 @@ fn create_new_excel(
 
 #[allow(unused_variables)]
 fn main() {
-    let field_output = "Poliza, numpol, Chasis,desmotor, producto='pepe pe', codepais=ar, Zona Riesgo";
-    let field_match1 = "numpol".to_string();
-    let field_match2 = "Poliza".to_string();
-    let distinct = true;
-    let name_file1 = "./test_files/test_dup.xlsx".to_string();
-    let name_file2 = "./test_files/test_dup.xlsx".to_string();
-    let name_file_out = "./out_files/test_dup.xlsx".to_string();
+    let matches = App::new("rust-joiner-excel")
+        .version("1.0")
+        .author("Arturo Elias Anton <arturoeanton@gmail.com>")
+        .about("Joiner excel")
+        .arg(
+            Arg::with_name("file1")
+                .short("1")
+                .long("file1")
+                .value_name("FILE")
+                .help("File 1")
+                .required(true)
+                .takes_value(true),
+        )
+        .arg(
+            Arg::with_name("file2")
+                .short("2")
+                .long("file2")
+                .value_name("FILE")
+                .help("File 2"),
+        )
+        .arg(
+            Arg::with_name("file_out")
+                .short("o")
+                .long("file_out")
+                .value_name("FILE")
+                .help("File Out")
+                .required(true)
+                .takes_value(true),
+        )
+        .arg(
+            Arg::with_name("sheet1")
+                .short("a")
+                .long("sheet1")
+                .value_name("Sheet1")
+                .help("Sheet 1")
+                .required(true),
+        )
+        .arg(
+            Arg::with_name("sheet2")
+                .short("b")
+                .long("sheet2")
+                .value_name("Sheet2")
+                .help("Sheet 2")
+                .required(true),
+        )
+        .arg(
+            Arg::with_name("sheet_out")
+                .short("s")
+                .long("sheet_out")
+                .value_name("SheetOut")
+                .help("Sheet Out")
+        )
+        .arg(
+            Arg::with_name("field_match1")
+                .short("x")
+                .long("field_match1")
+                .value_name("Field Match 1")
+                .help("Field Match 1")
+                .required(true),
+        )
+        .arg(
+            Arg::with_name("field_match2")
+                .short("y")
+                .long("field_match2")
+                .value_name("Field Match 2")
+                .help("Field Match 2")
+                .required(true),
+        )
+        .arg(
+            Arg::with_name("distinct")
+                .short("d")
+                .long("distinct")
+                .help("Distinct"),
+        )
+        .arg(
+            Arg::with_name("fields_output")
+                .short("O")
+                .value_name("Fields Output")
+                .long("fields_output")
+                .required(true)
+                .help("Fields Output"),
+        )
+        .get_matches();
 
-    let sheet_name1 = "Vista Qlik".to_string();
-    let sheet_name2 = "Spool (SISE)".to_string();
-    let sheet_name_out = "Sheet1".to_string();
+    let field_output =   matches.value_of("fields_output").unwrap().to_string();
+        //"Poliza, numpol, Chasis,desmotor, producto='pepe pe', codepais=ar, Zona Riesgo";
+    let field_match1 = matches.value_of("field_match1").unwrap().to_string();
+    //"numpol".to_string();
+    let field_match2 = matches.value_of("field_match2").unwrap().to_string();
+    //"Poliza".to_string();
+    let distinct = matches.is_present("distinct"); 
+    //true;
+    let name_file1 = matches.value_of("file1").unwrap();
+    //"./test_files/test_dup.xlsx".to_string();
+    let name_file2 = matches.value_of("file2").unwrap_or(name_file1);
+    //"./test_files/test_dup.xlsx".to_string();
+    let name_file_out = matches.value_of("file_out").unwrap();
+    //"./out_files/test_dup.xlsx".to_string();
 
+    let sheet_name1 =  matches.value_of("sheet1").unwrap_or("Sheet1");
+    //"Vista Qlik".to_string();
+    let sheet_name2 = matches.value_of("sheet2").unwrap_or("Sheet1");
+    //"Spool (SISE)".to_string();
+
+    let sheet_name_out = matches.value_of("sheet_out").unwrap_or("Sheet1");
+    //"Sheet1".to_string();
+    
 
     let page1 = reader_xlsx(&name_file1, &sheet_name1).unwrap();
     let page2 = reader_xlsx(&name_file2, &sheet_name2).unwrap();
@@ -177,3 +275,11 @@ fn main() {
     let fieds: Vec<&str> = field_output.split(",").collect();
     let _ = create_new_excel(&name_file_out, &sheet_name_out, &fieds, &page_out);
 }
+/*
+cargo run -- \
+    --file1 "./test_files/test_dup.xlsx"  --file_out "./out_files/test_dup1.xlsx"  --sheet1 "Vista Qlik"  --sheet2 "Spool (SISE)"  \
+    --field_match1 numpol \
+    --field_match2 Poliza \
+    --fields_output "Poliza, numpol, Chasis,desmotor, producto='pepe pe', codepais=ar, Zona Riesgo"   
+
+*/
