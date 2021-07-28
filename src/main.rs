@@ -140,7 +140,7 @@ fn main() {
     let field_output = "Poliza, numpol, Chasis,desmotor, Zona Riesgo";
     let field_match1 = "numpol".to_string();
     let field_match2 = "Poliza".to_string();
-
+    let distinct = true;
     let name_file1 = "./test_files/test_dup.xlsx".to_string();
     let name_file2 = "./test_files/test_dup.xlsx".to_string();
     let name_file_out = "./out_files/test_dup.xlsx".to_string();
@@ -152,7 +152,7 @@ fn main() {
     let page1 = reader_xlsx(&name_file1, &sheet_name1).unwrap();
     let page2 = reader_xlsx(&name_file2, &sheet_name2).unwrap();
 
-    let page_out = merge_pages(&page1, &page2, &field_match1, &field_match2, &false).unwrap();
+    let page_out = merge_pages(&page1, &page2, &field_match1, &field_match2, &distinct).unwrap();
 
     let fieds: Vec<&str> = field_output.split(",").collect();
     let _ = create_new_excel(&name_file_out, &sheet_name_out, &fieds, &page_out);
