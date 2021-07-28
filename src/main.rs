@@ -91,7 +91,7 @@ fn create_new_excel(
 
         let mut row = Row::new();
         for field in fields.iter() {
-            row.add_cell(field.to_string(), CellStyle::Bold);
+            row.add_cell(field.to_string(), CellStyle::BoldCenter);
         }
         let mut result = sw.append_row(row);
 
@@ -107,19 +107,19 @@ fn create_new_excel(
                         if dt.is_int() {
                             let v = dt.get_int().unwrap_or_default();
                             let cell = CellValue::Number(v as f64);
-                            row_writer.add_cell(cell, CellStyle{index:3});
+                            row_writer.add_cell(cell, CellStyle::Left);
                         } else if dt.is_float() {
                             let v = dt.get_float().unwrap_or_default();
                             let cell = CellValue::Number(v);
-                            row_writer.add_cell(cell,CellStyle{index:3});
+                            row_writer.add_cell(cell,CellStyle::Left);
                         } else if dt.is_bool() {
                             let v = dt.get_bool().unwrap_or_default();
                             let cell = CellValue::Bool(v);
-                            row_writer.add_cell(cell,CellStyle{index:3});
+                            row_writer.add_cell(cell,CellStyle::Right);
                         } else if dt.is_empty() {
                             row_writer.add_empty_cells(1);
                         } else {
-                            row_writer.add_cell(dt.get_string().unwrap_or_default(),CellStyle{index:1});
+                            row_writer.add_cell(dt.get_string().unwrap_or_default(),CellStyle::Left);
                         }
                     }
                     None => {}

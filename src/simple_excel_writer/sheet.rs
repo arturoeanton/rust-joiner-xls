@@ -36,29 +36,27 @@ pub struct Row {
     max_col_index: usize,
 }
 
+#[derive(Clone, Copy)]
+#[allow(dead_code)]
 pub enum CellStyle {
-    
     Normal = 0,
     Bold = 1,
     Italic = 2,
     BoldItalic = 3,
-    
     Left = 4,
     Center = 5,
     Right = 6,
-    
     BoldLeft = 7,
     BoldCenter = 8,
-    BoldRight =     9,   
-    
-    ItalicLeft = 10 ,
+    BoldRight = 9,
+
+    ItalicLeft = 10,
     ItalicCenter = 11,
     ItalicRight = 12,
 
     BoldItalicLeft = 13,
     BoldItalicCenter = 14,
-    BoldItalicRight =15,
-
+    BoldItalicRight = 15,
 }
 
 pub struct Cell {
@@ -151,7 +149,6 @@ impl Row {
     pub fn add_empty_cells(&mut self, cols: usize) {
         self.max_col_index += cols
     }
-    
     pub fn join(&mut self, row: Row) {
         for cell in row.cells.into_iter() {
             self.inner_add_cell(cell)
@@ -196,13 +193,7 @@ impl ToCellValue for CellValue {
     }
 }
 
-fn write_value(
-    cv: &CellValue,
-    cs: &CellStyle,
-    ref_id: String,
-    writer: &mut dyn Write,
-) -> Result<()> {
-    let index = (*cs)  as i32;
+fn write_value(cv: &CellValue, index: i8, ref_id: String, writer: &mut dyn Write) -> Result<()> {
     match cv {
         CellValue::Bool(b) => {
             let v = if *b { 1 } else { 0 };
@@ -248,7 +239,8 @@ fn escape_xml(str: &str) -> String {
 impl Cell {
     fn write(&self, row_index: usize, writer: &mut dyn Write) -> Result<()> {
         let ref_id = format!("{}{}", column_letter(self.column_index), row_index);
-        write_value(&self.value, &self.style, ref_id, writer)
+        let index = self.style as i8;
+        write_value(&self.value, index, ref_id, writer)
     }
 }
 

@@ -380,6 +380,23 @@ impl Workbook {
             <family val="2"/>
             <scheme val="minor"/>
         </font>
+        <font>
+            <i val="true"/>
+            <sz val="12"/>
+            <color theme="1"/>
+            <name val="Calibri"/>
+            <family val="2"/>
+            <scheme val="minor"/>
+        </font>
+        <font>
+            <b val="true"/>
+            <i val="true"/>
+            <sz val="12"/>
+            <color theme="1"/>
+            <name val="Calibri"/>
+            <family val="2"/>
+            <scheme val="minor"/>
+        </font>
     </fonts>
     <fills count="2">
         <fill>
@@ -405,27 +422,52 @@ impl Workbook {
     </cellStyleXfs>
     <cellXfs count="2">
         <xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0" applyNumberFormat="1"/>
-        <xf numFmtId="1" fontId="0" fillId="0" borderId="0">
+        <xf numFmtId="1" fontId="1" fillId="0" borderId="0" xfId="0" applyNumberFormat="1" />
+        <xf numFmtId="2" fontId="2" fillId="0" borderId="0" xfId="0" applyNumberFormat="1" />
+        <xf numFmtId="3" fontId="3" fillId="0" borderId="0" xfId="0" applyNumberFormat="1" />
+       
+        <xf numFmtId="4" fontId="0" fillId="0" borderId="0" xfId="0" applyNumberFormat="1">
             <alignment horizontal="left" vertical="bottom" textRotation="0" wrapText="false" indent="0" shrinkToFit="false"/>
         </xf>
-        <xf numFmtId="2" fontId="0" fillId="0" borderId="0">
+        <xf numFmtId="5" fontId="0" fillId="0" borderId="0" xfId="0" applyNumberFormat="1">
             <alignment horizontal="center" vertical="bottom" textRotation="0" wrapText="false" indent="0" shrinkToFit="false"/>
         </xf>
-        <xf numFmtId="3" fontId="0" fillId="0" borderId="0">
+        <xf numFmtId="6" fontId="0" fillId="0" borderId="0" xfId="0" applyNumberFormat="1">
+            <alignment horizontal="right" vertical="bottom" textRotation="0" wrapText="false" indent="0" shrinkToFit="false"/>
+        </xf>
+        
+        <xf numFmtId="7" fontId="1" fillId="0" borderId="0" xfId="0" applyNumberFormat="1">
+            <alignment horizontal="left" vertical="bottom" textRotation="0" wrapText="false" indent="0" shrinkToFit="false"/>
+        </xf>
+        <xf numFmtId="8" fontId="1" fillId="0" borderId="0" xfId="0" applyNumberFormat="1">
+            <alignment horizontal="center" vertical="bottom" textRotation="0" wrapText="false" indent="0" shrinkToFit="false"/>
+        </xf>
+        <xf numFmtId="9" fontId="1" fillId="0" borderId="0" xfId="0" applyNumberFormat="1">
             <alignment horizontal="right" vertical="bottom" textRotation="0" wrapText="false" indent="0" shrinkToFit="false"/>
         </xf>
 
-        <xf numFmtId="4" fontId="1" fillId="0" borderId="0">
+        <xf numFmtId="10" fontId="2" fillId="0" borderId="0" xfId="0" applyNumberFormat="1">
             <alignment horizontal="left" vertical="bottom" textRotation="0" wrapText="false" indent="0" shrinkToFit="false"/>
         </xf>
-        <xf numFmtId="5" fontId="1" fillId="0" borderId="0">
+        <xf numFmtId="11" fontId="2" fillId="0" borderId="0" xfId="0" applyNumberFormat="1">
             <alignment horizontal="center" vertical="bottom" textRotation="0" wrapText="false" indent="0" shrinkToFit="false"/>
         </xf>
-        <xf numFmtId="6" fontId="1" fillId="0" borderId="0">
+        <xf numFmtId="12" fontId="2" fillId="0" borderId="0" xfId="0" applyNumberFormat="1">
+            <alignment horizontal="right" vertical="bottom" textRotation="0" wrapText="false" indent="0" shrinkToFit="false"/>
+        </xf>
+
+        <xf numFmtId="13" fontId="3" fillId="0" borderId="0" xfId="0" applyNumberFormat="1">
+            <alignment horizontal="left" vertical="bottom" textRotation="0" wrapText="false" indent="0" shrinkToFit="false"/>
+        </xf>
+        <xf numFmtId="14" fontId="3" fillId="0" borderId="0" xfId="0" applyNumberFormat="1">
+            <alignment horizontal="center" vertical="bottom" textRotation="0" wrapText="false" indent="0" shrinkToFit="false"/>
+        </xf>
+        <xf numFmtId="15" fontId="3" fillId="0" borderId="0" xfId="0" applyNumberFormat="1">
             <alignment horizontal="right" vertical="bottom" textRotation="0" wrapText="false" indent="0" shrinkToFit="false"/>
         </xf>
 
 
+    
     </cellXfs>
     <cellStyles count="1">
         <cellStyle name="Normal" xfId="0" builtinId="0"/>
