@@ -8,6 +8,7 @@ edition = "2018"
 [dependencies]
 calamine = "0.18.0"
 clap = "2.33.3"
+chrono = "0.4.19"
 
 [dependencies.zip]
 version = "0.5.5"

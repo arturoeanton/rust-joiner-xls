@@ -79,6 +79,7 @@ fn create_new_excel(
     sheet1: &str,
     fields: &Vec<&str>,
     page: &Vec<HashMap<String, DataType>>,
+    format_date: &str
 ) -> Result<(), Error> {
     let mut wb = Workbook::create(path);
     let mut sheet = wb.create_sheet(sheet1);
@@ -92,49 +93,79 @@ fn create_new_excel(
         let sw = sheet_writer;
 
         let mut row = Row::new();
+        let mut only_fields_names:Vec<String> = Vec::new(); 
+        let mut data_fix_map: HashMap<String,String> = HashMap::new();
         for field in fields.iter() {
-            let data_fix: Vec<&str> = field.split("=").collect();
-            if data_fix.len() == 2 {
-                let key_fix = data_fix[0].trim();
-                row.add_cell(key_fix, CellStyle::BoldLeft);
-                continue;
+            let params: Vec<&str> = field.split(":as:").collect();
+            let param1 = params[0].to_string();
+            let mut key_name = param1.to_string();
+            let mut alias_name = key_name.to_string();
+            if params.len() == 2 { // tenes alias
+                alias_name = params[1].to_string();
             }
-            row.add_cell(field.to_string(), CellStyle::BoldCenter);
+            let subparams:Vec<&str>  = param1.split("=").collect();
+            if subparams.len() == 2 {
+                key_name = subparams[0].to_string().trim().to_string();
+                let value =  subparams[1].to_string().trim().to_string();
+                data_fix_map.insert(key_name.to_string(), value);
+                if params.len() != 2 {
+                    alias_name = key_name.to_string();
+                }
+            }
+            println!("{}",alias_name);
+            println!("{}",key_name);
+            println!("----");
+
+            row.add_cell(alias_name, CellStyle::BoldCenter);
+            only_fields_names.push(key_name);
         }
         let mut result = sw.append_row(row);
 
         for page_row in page.iter() {
             let mut row_writer = Row::new();
-            for field in fields.iter() {
+            for field in only_fields_names.iter() {
                 let key = String::from(field.to_string());
                 let data1 = page_row.get(key.trim());
-
                 match data1 {
-                    Some(dt) => {
-                        if dt.is_int() {
-                            let v = dt.get_int().unwrap_or_default();
-                            let cell = CellValue::Number(v as f64);
+                    Some(dt) => match dt {
+                        DataType::Int(value) => {
+                            let cell = CellValue::Number(*value as f64);
                             row_writer.add_cell(cell, CellStyle::BoldLeft);
-                        } else if dt.is_float() {
-                            let v = dt.get_float().unwrap_or_default();
-                            let cell = CellValue::Number(v);
-                            row_writer.add_cell(cell, CellStyle::BoldLeft);
-                        } else if dt.is_bool() {
-                            let v = dt.get_bool().unwrap_or_default();
-                            let cell = CellValue::Bool(v);
-                            row_writer.add_cell(cell, CellStyle::BoldLeft);
-                        } else if dt.is_empty() {
-                            row_writer.add_empty_cells(1);
-                        } else {
-                            row_writer
-                                .add_cell(dt.get_string().unwrap_or_default(), CellStyle::Left);
                         }
-                    }
+                        DataType::Float(value) => {
+                            let cell = CellValue::Number(*value);
+                            row_writer.add_cell(cell, CellStyle::BoldLeft);
+                        }
+                        DataType::Bool(value) => {
+                            let cell = CellValue::Bool(*value);
+                            row_writer.add_cell(cell, CellStyle::BoldLeft);
+                        }
+                        DataType::DateTime(value) => {
+                            let unix_days = value - 25569.;
+                            let unix_secs = unix_days * 86400.;
+                            let secs = unix_secs.trunc() as i64;
+                            let nsecs = (unix_secs.fract().abs() * 1e9) as u32;
+                            let ch = chrono::NaiveDateTime::from_timestamp_opt(secs, nsecs);
+
+                            let value = format!("{}", ch.unwrap().format(format_date));
+                            let cell = CellValue::String(value);
+                            row_writer.add_cell(cell, CellStyle::BoldLeft);
+                        }
+                        DataType::String(value) => {
+                            let cell = CellValue::String(value.to_string());
+                            row_writer.add_cell(cell, CellStyle::Left)
+                        }
+                        DataType::Empty =>{
+                            row_writer.add_empty_cells(1);
+                        }
+                        _ => {
+                            row_writer.add_empty_cells(1);
+                        }
+                    },
                     None => {
-                        let data_fix: Vec<&str> = key.split("=").collect();
-                        if data_fix.len() == 2 {
-                            let value_fix = data_fix[1].trim();
-                            let mut v = value_fix.to_string();
+                            let value_fix = data_fix_map.get(field);
+                            println!("{}",field);
+                            let mut v = value_fix.unwrap().to_string();
                             match (v.chars().nth(0), v.chars().rev().nth(0)) {
                                 (Some('\''), Some('\'')) => {
                                     v.pop();
@@ -143,7 +174,7 @@ fn create_new_excel(
                                 _ => {}
                             }
                             row_writer.add_cell(v, CellStyle::Left);
-                        }
+                        
                     }
                 }
             }
@@ -239,8 +270,15 @@ fn main() {
                 .required(true)
                 .help("Fields Output"),
         )
+        .arg(
+            Arg::with_name("format_date")
+                .value_name("Format Date")
+                .long("%m/%d/%Y")
+                .help("Fields Output"),
+        )
         .get_matches();
 
+    let format_date = matches.value_of("format_date").unwrap_or("%m/%d/%Y") ;//"%Y-%m-%d %H:%M:%S";
     let field_output = matches.value_of("fields_output").unwrap().to_string();
     let field_match1 = matches.value_of("field_match1").unwrap().to_string();
     let field_match2 = matches.value_of("field_match2").unwrap().to_string();
@@ -258,7 +296,7 @@ fn main() {
     let page_out = merge_pages(&page1, &page2, &field_match1, &field_match2, &distinct).unwrap();
 
     let fieds: Vec<&str> = field_output.split(",").collect();
-    let _ = create_new_excel(&name_file_out, &sheet_name_out, &fieds, &page_out);
+    let _ = create_new_excel(&name_file_out, &sheet_name_out, &fieds, &page_out, format_date);
 }
 /*
 cargo run -- \
