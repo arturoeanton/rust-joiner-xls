@@ -272,9 +272,9 @@ fn main() {
         )
         .arg(
             Arg::with_name("format_date")
-                .value_name("Format Date")
-                .long("%m/%d/%Y")
-                .help("Fields Output"),
+                .value_name("%m/%d/%Y")
+                .long("format_date")
+                .help("Format Date"),
         )
         .get_matches();
 
