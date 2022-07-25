@@ -6,7 +6,7 @@ Those sheets can be in separate files or in one file.
 
 ## Installation
 
- * Xlsx joiner requieres Rust to run. 
+ * Xlsx joiner requires Rust to run. 
 
 ## Usage
 
